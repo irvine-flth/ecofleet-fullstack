@@ -1,0 +1,29 @@
+services:
+  db:
+    image: mariadb:11
+    container_name: ecofleet-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+    ports:
+      - "${MARIADB_PORT}:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+  
+  backend:
+    build: ./backend
+    container_name: ecofleet-backend
+    ports:
+      - "${SPRING_PORT}:8080"
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mariadb://db:3306/${DB_NAME}
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      API_KEY: ${API_KEY}
+
+volumes:
+  db_data:
