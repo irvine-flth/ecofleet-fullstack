@@ -1,48 +1,98 @@
-<mat-card>
-  <h2>Fleet Vehicles</h2>
-  <table mat-table [dataSource]="vehicles" class="mat-elevation-z2">
+<div class="min-h-screen bg-gray-100 p-6">
+  <div class="max-w-7xl mx-auto">
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-2xl font-semibold text-gray-800">🚗 EcoFleet - Vehicles</h1>
+      <button class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded shadow" (click)="openModal()">
+        + Add Vehicle
+      </button>
+    </div>
 
-    <ng-container matColumnDef="registrationNumber">
-      <th mat-header-cell *matHeaderCellDef> Registration </th>
-      <td mat-cell *matCellDef="let v"> {{v.registrationNumber}} </td>
-    </ng-container>
+    <div class="overflow-auto rounded-lg shadow ring-1 ring-black ring-opacity-5">
+      <table class="min-w-full divide-y divide-gray-200 bg-white">
+        <thead class="bg-gray-50 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+        <tr>
+          <th class="px-6 py-3">Registration</th>
+          <th class="px-6 py-3">Type</th>
+          <th class="px-6 py-3">Brand</th>
+          <th class="px-6 py-3">Model</th>
+          <th class="px-6 py-3">Autonomy (km)</th>
+          <th class="px-6 py-3">Current KM</th>
+          <th class="px-6 py-3">Last Maintenance</th>
+          <th class="px-6 py-3">Status</th>
+        </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 text-sm text-gray-800">
+        <tr *ngFor="let v of vehicles" [ngClass]="v.isAvailable ? 'bg-green-50' : 'bg-red-50'">
+          <td class="px-6 py-4 whitespace-nowrap">{{ v.registrationNumber }}</td>
+          <td class="px-6 py-4 whitespace-nowrap">{{ v.type }}</td>
+          <td class="px-6 py-4 whitespace-nowrap">{{ v.brand }}</td>
+          <td class="px-6 py-4 whitespace-nowrap">{{ v.model }}</td>
+          <td class="px-6 py-4 whitespace-nowrap">{{ v.autonomyKm }}</td>
+          <td class="px-6 py-4 whitespace-nowrap">{{ v.currentKm }}</td>
+          <td class="px-6 py-4 whitespace-nowrap">{{ v.lastMaintenanceDate | date }}</td>
+          <td class="px-6 py-4">
+              <span
+                [ngClass]="{
+                  'bg-green-200 text-green-800': v.isAvailable,
+                  'bg-red-200 text-red-800': !v.isAvailable
+                }"
+                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+              >
+                {{ v.isAvailable ? 'Available' : 'Unavailable' }}
+              </span>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
 
-    <ng-container matColumnDef="type">
-      <th mat-header-cell *matHeaderCellDef> Type </th>
-      <td mat-cell *matCellDef="let v"> {{v.type}} </td>
-    </ng-container>
+<div class="fixed inset-0 backdrop-blur-sm bg-white/30 z-50 flex items-center justify-center" *ngIf="isModalOpen">
+  <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-xl relative">
+    <button class="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
+            (click)="closeModal()">
+      ✖
+    </button>
 
-    <ng-container matColumnDef="brand">
-      <th mat-header-cell *matHeaderCellDef> Brand </th>
-      <td mat-cell *matCellDef="let v"> {{v.brand}} </td>
-    </ng-container>
+    <h2 class="text-lg font-semibold mb-4">Add Vehicle</h2>
 
-    <ng-container matColumnDef="model">
-      <th mat-header-cell *matHeaderCellDef> Model </th>
-      <td mat-cell *matCellDef="let v"> {{v.model}} </td>
-    </ng-container>
-
-    <ng-container matColumnDef="autonomyKm">
-      <th mat-header-cell *matHeaderCellDef> Autonomy (km) </th>
-      <td mat-cell *matCellDef="let v"> {{v.autonomyKm}} </td>
-    </ng-container>
-
-    <ng-container matColumnDef="currentKm">
-      <th mat-header-cell *matHeaderCellDef> Current KM </th>
-      <td mat-cell *matCellDef="let v"> {{v.currentKm}} </td>
-    </ng-container>
-
-    <ng-container matColumnDef="lastMaintenanceDate">
-      <th mat-header-cell *matHeaderCellDef> Last Maintenance </th>
-      <td mat-cell *matCellDef="let v"> {{v.lastMaintenanceDate | date}} </td>
-    </ng-container>
-
-    <ng-container matColumnDef="isAvailable">
-      <th mat-header-cell *matHeaderCellDef> Available </th>
-      <td mat-cell *matCellDef="let v"> {{v.isAvailable ? 'Yes' : 'No'}} </td>
-    </ng-container>
-
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-  </table>
-</mat-card>
+    <form #vehicleForm="ngForm" (ngSubmit)="onSubmit(vehicleForm)">
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium mb-1">Registration</label>
+          <input class="form-input border p-2 rounded w-full" type="text" name="registrationNumber" placeholder="Registration" [(ngModel)]="newVehicle.registrationNumber" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Type</label>
+          <select class="form-select border p-2 rounded w-full" name="type" [(ngModel)]="newVehicle.type" required>
+            <option value="" disabled selected>Type</option>
+            <option *ngFor="let t of vehiclesTypes" [value]="t">{{ t }}</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Brand</label>
+          <input class="form-input border p-2 rounded w-full" type="text" name="brand" placeholder="Brand" [(ngModel)]="newVehicle.brand">
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Model</label>
+          <input class="form-input border p-2 rounded w-full" type="text" name="model" placeholder="Model" [(ngModel)]="newVehicle.model">
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Autonomy (km)</label>
+          <input class="form-input border p-2 rounded w-full" type="number" name="autonomyKm" placeholder="Autonomy (km)" [(ngModel)]="newVehicle.autonomyKm">
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Current KM</label>
+          <input class="form-input border p-2 rounded w-full" type="number" name="currentKm" placeholder="Current KM" [(ngModel)]="newVehicle.currentKm">
+        </div>
+      </div>
+      <div class="mt-4 flex justify-end">
+        <button type="submit"
+                class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded">
+          Save
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
