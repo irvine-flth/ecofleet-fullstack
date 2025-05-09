@@ -31,5 +31,13 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       API_KEY: ${API_KEY}
 
+  frontend:
+    build: ./frontend
+    container_name: ecofleet-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+
 volumes:
   db_data:
