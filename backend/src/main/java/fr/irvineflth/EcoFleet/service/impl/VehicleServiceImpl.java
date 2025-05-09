@@ -2,11 +2,14 @@ package fr.irvineflth.EcoFleet.service.impl;
 
 import fr.irvineflth.EcoFleet.domain.entity.Vehicle;
 import fr.irvineflth.EcoFleet.dto.VehicleDto;
+import fr.irvineflth.EcoFleet.exception.ResourceNotFoundException;
 import fr.irvineflth.EcoFleet.mapper.VehicleMapper;
 import fr.irvineflth.EcoFleet.repository.VehicleRepository;
 import fr.irvineflth.EcoFleet.service.VehicleService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -27,7 +30,7 @@ public class VehicleServiceImpl implements VehicleService {
         return this.repository
                 .findById(id)
                 .map(this.mapper::toDto)
-                .orElseThrow(() -> new RuntimeException("Vehicle not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found with id: " + id));
     }
 
     @Override
