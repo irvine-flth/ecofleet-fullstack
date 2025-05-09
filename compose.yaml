@@ -10,6 +10,11 @@ services:
       - "${MARIADB_PORT}:3306"
     volumes:
       - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mariadb", "-h", "localhost", "-u", "${DB_USERNAME}", "-p${DB_PASSWORD}", "-e", "SELECT 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
   
   backend:
     build: ./backend
@@ -17,7 +22,8 @@ services:
     ports:
       - "${SPRING_PORT}:8080"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:mariadb://db:3306/${DB_NAME}
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
