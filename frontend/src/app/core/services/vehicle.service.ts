@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {Vehicle} from '../models/vehicle.model';
-import {CreateVehicleDto} from '../dto/create-vehicle.dto';
+import {VehicleDto} from '../dto/vehicle.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -20,12 +20,12 @@ export class VehicleService {
     return this.http.get<Vehicle>(`${this.baseUrl}/${id}`);
   }
 
-  create(dto: CreateVehicleDto): Observable<Vehicle> {
+  create(dto: VehicleDto): Observable<Vehicle> {
     return this.http.post<Vehicle>(this.baseUrl, dto);
   }
 
-  update(id: number, vehicle: Vehicle): Observable<Vehicle> {
-    return this.http.put<Vehicle>(`${this.baseUrl}/${id}`, vehicle);
+  update(id: number, dto: VehicleDto): Observable<Vehicle> {
+    return this.http.put<Vehicle>(`${this.baseUrl}/${id}`, dto);
   }
 
   delete(id: number): Observable<void> {

@@ -1,5 +1,6 @@
 package fr.irvineflth.EcoFleet.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.irvineflth.EcoFleet.domain.enums.VehicleType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -33,5 +34,6 @@ public class Vehicle {
 
     private LocalDate lastMaintenanceDate;
 
-    private boolean isAvailable = true;
+    @Column(name = "available")
+    private boolean available = true;
 }

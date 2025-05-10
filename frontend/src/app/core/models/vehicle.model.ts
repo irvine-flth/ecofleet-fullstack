@@ -9,5 +9,5 @@ export interface Vehicle {
   autonomyKm: number;
   currentKm: number;
   lastMaintenanceDate: string;
-  isAvailable: boolean;
+  available: string;
 }

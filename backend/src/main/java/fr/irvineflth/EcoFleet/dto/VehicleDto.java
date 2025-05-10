@@ -21,5 +21,5 @@ public class VehicleDto {
     private Integer autonomyKm;
     private Integer currentKm;
     private LocalDate lastMaintenanceDate;
-    private boolean isAvailable;
+    private boolean available;
 }

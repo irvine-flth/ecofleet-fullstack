@@ -19,10 +19,11 @@
           <th class="px-6 py-3">Current KM</th>
           <th class="px-6 py-3">Last Maintenance</th>
           <th class="px-6 py-3">Status</th>
+          <th class="px-6 py-3">Action</th>
         </tr>
         </thead>
         <tbody class="divide-y divide-gray-200 text-sm text-gray-800">
-        <tr *ngFor="let v of vehicles" [ngClass]="v.isAvailable ? 'bg-green-50' : 'bg-red-50'">
+        <tr *ngFor="let v of vehicles" [ngClass]="v.available ? 'bg-green-50' : 'bg-red-50'">
           <td class="px-6 py-4 whitespace-nowrap">{{ v.registrationNumber }}</td>
           <td class="px-6 py-4 whitespace-nowrap">{{ v.type }}</td>
           <td class="px-6 py-4 whitespace-nowrap">{{ v.brand }}</td>
@@ -33,13 +34,21 @@
           <td class="px-6 py-4">
               <span
                 [ngClass]="{
-                  'bg-green-200 text-green-800': v.isAvailable,
-                  'bg-red-200 text-red-800': !v.isAvailable
+                  'bg-green-200 text-green-800': v.available,
+                  'bg-red-200 text-red-800': !v.available
                 }"
                 class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
               >
-                {{ v.isAvailable ? 'Available' : 'Unavailable' }}
+                {{ v.available ? 'Available' : 'Unavailable' }}
               </span>
+          </td>
+          <td class="px-6 py-4 gap-x-3 flex items-center">
+            <button (click)="deleteVehicle(v.id)">
+              <fa-icon [icon]="faTrash" class="text-red-600 hover:text-red-800"></fa-icon>
+            </button>
+            <button (click)="editVehicle(v)">
+              <fa-icon [icon]="faPen" class="text-blue-600 hover:text-blue-800"></fa-icon>
+            </button>
           </td>
         </tr>
         </tbody>
@@ -57,40 +66,97 @@
 
     <h2 class="text-lg font-semibold mb-4">Add Vehicle</h2>
 
-    <form #vehicleForm="ngForm" (ngSubmit)="onSubmit(vehicleForm)">
+    <form [formGroup]="vehicleForm" (ngSubmit)="onSubmit()">
       <div class="grid grid-cols-2 gap-4">
         <div>
           <label class="block text-sm font-medium mb-1">Registration</label>
-          <input class="form-input border p-2 rounded w-full" type="text" name="registrationNumber" placeholder="Registration" [(ngModel)]="newVehicle.registrationNumber" required>
+          <input class="form-input border p-2 rounded w-full" type="text" placeholder="Registration" formControlName="registrationNumber">
+          @if (registrationNumber.invalid && (registrationNumber.touched || registrationNumber.dirty)) {
+            <div class="text-red-600 text-xs mt-1">
+              @if (registrationNumber.hasError('required')) {
+                <div>Registration is required.</div>
+              }
+            </div>
+          }
         </div>
         <div>
           <label class="block text-sm font-medium mb-1">Type</label>
-          <select class="form-select border p-2 rounded w-full" name="type" [(ngModel)]="newVehicle.type" required>
+          <select class="form-select border p-2 rounded w-full" formControlName="type">
             <option value="" disabled selected>Type</option>
             <option *ngFor="let t of vehiclesTypes" [value]="t">{{ t }}</option>
           </select>
+          @if (type.invalid && (type.touched || type.dirty)) {
+            <div class="text-red-600 text-xs mt-1">
+              @if (type.hasError('required')) {
+                <div>Type is required.</div>
+              }
+            </div>
+          }
         </div>
         <div>
           <label class="block text-sm font-medium mb-1">Brand</label>
-          <input class="form-input border p-2 rounded w-full" type="text" name="brand" placeholder="Brand" [(ngModel)]="newVehicle.brand">
+          <input class="form-input border p-2 rounded w-full" type="text" placeholder="Brand" formControlName="brand">
+          @if (brand.invalid && (brand.touched || brand.dirty)) {
+            <div class="text-red-600 text-xs mt-1">
+              @if (brand.hasError('required')) {
+                <div>Brand is required.</div>
+              }
+            </div>
+          }
         </div>
         <div>
           <label class="block text-sm font-medium mb-1">Model</label>
-          <input class="form-input border p-2 rounded w-full" type="text" name="model" placeholder="Model" [(ngModel)]="newVehicle.model">
+          <input class="form-input border p-2 rounded w-full" type="text" placeholder="Model" formControlName="model">
+          @if (model.invalid && (model.touched || model.dirty)) {
+            <div class="text-red-600 text-xs mt-1">
+              @if (model.hasError('required')) {
+                <div>Model is required.</div>
+              }
+            </div>
+          }
         </div>
         <div>
           <label class="block text-sm font-medium mb-1">Autonomy (km)</label>
-          <input class="form-input border p-2 rounded w-full" type="number" name="autonomyKm" placeholder="Autonomy (km)" [(ngModel)]="newVehicle.autonomyKm">
+          <input class="form-input border p-2 rounded w-full" type="number" placeholder="Autonomy (km)" formControlName="autonomyKm">
+          @if (autonomyKm.invalid && (autonomyKm.touched || autonomyKm.dirty)) {
+            <div class="text-red-600 text-xs mt-1">
+              @if (autonomyKm.hasError('required')) {
+                <div>Autonomy is required.</div>
+              }
+              @if (autonomyKm.hasError('min')) {
+                <div>Autonomy must be at least 1 km.</div>
+              }
+            </div>
+          }
         </div>
         <div>
           <label class="block text-sm font-medium mb-1">Current KM</label>
-          <input class="form-input border p-2 rounded w-full" type="number" name="currentKm" placeholder="Current KM" [(ngModel)]="newVehicle.currentKm">
+          <input class="form-input border p-2 rounded w-full" type="number" placeholder="Current KM" formControlName="currentKm">
+          @if (currentKm.invalid && (currentKm.touched || currentKm.dirty)) {
+            <div class="text-red-600 text-xs mt-1">
+              @if (currentKm.hasError('required')) {
+                <div>Current hm is required.</div>
+              }
+              @if (currentKm.hasError('min')) {
+                <div>Current km must be at least 0 km.</div>
+              }
+            </div>
+          }
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Is available ?</label>
+          <label class="inline-flex items-center cursor-pointer">
+            <input type="checkbox" class="sr-only peer" formControlName="available">
+            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full peer peer-checked:bg-green-500 transition-colors duration-200 ease-in-out"></div>
+            <span class="ml-3 text-sm text-gray-900">{{ available.value ? 'Yes' : 'No' }}</span>
+          </label>
         </div>
       </div>
       <div class="mt-4 flex justify-end">
         <button type="submit"
+                [disabled]="vehicleForm.invalid"
                 class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded">
-          Save
+          {{ currentEditingId ? 'Update' : 'Add' }}
         </button>
       </div>
     </form>

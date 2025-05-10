@@ -18,7 +18,9 @@ public class VehicleController {
 
     @GetMapping
     public ResponseEntity<List<VehicleDto>> getAll() {
-        return ResponseEntity.ok(this.service.findAll());
+        List<VehicleDto> vehicles = this.service.findAll();
+        vehicles.forEach(v -> System.out.println(v.getRegistrationNumber() + " available: " + v.isAvailable()));
+        return ResponseEntity.ok(vehicles);
     }
 
     @GetMapping("/{id}")
