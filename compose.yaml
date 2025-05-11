@@ -11,11 +11,22 @@ services:
     volumes:
       - db_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mariadb", "-h", "localhost", "-u", "${DB_USERNAME}", "-p${DB_PASSWORD}", "-e", "SELECT 1"]
+      test:
+        [
+          "CMD",
+          "mariadb",
+          "-h",
+          "localhost",
+          "-u",
+          "${DB_USERNAME}",
+          "-p${DB_PASSWORD}",
+          "-e",
+          "SELECT 1",
+        ]
       interval: 5s
       timeout: 3s
       retries: 10
-  
+
   backend:
     build: ./backend
     container_name: ecofleet-backend
@@ -29,7 +40,6 @@ services:
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      API_KEY: ${API_KEY}
 
   frontend:
     build: ./frontend
