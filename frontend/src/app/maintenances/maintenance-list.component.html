@@ -22,14 +22,11 @@
         <tr *ngFor="let m of maintenances">
           <td class="px-6 py-4 whitespace-nowrap">{{ m.type }}</td>
           <td class="px-6 py-4 whitespace-nowrap">{{ m.date }}</td>
-          <td class="px-6 py-4 whitespace-nowrap">{{ m.cost }}</td>
+          <td class="px-6 py-4 whitespace-nowrap">{{ m.cost }}€</td>
           <td class="px-6 py-4 whitespace-nowrap">{{ m.vehicle.registrationNumber }}</td>
           <td class="px-6 py-4 gap-x-3 flex items-center">
             <button (click)="deleteMaintenance(m.id)">
               <fa-icon [icon]="faTrash" class="text-red-600 hover:text-red-800"></fa-icon>
-            </button>
-            <button (click)="editMaintenance(m)">
-              <fa-icon [icon]="faPen" class="text-blue-600 hover:text-blue-800"></fa-icon>
             </button>
           </td>
         </tr>
@@ -50,14 +47,45 @@
         <div>
           <label class="block text-sm font-medium mb-1">Type</label>
           <input type="text" class="form-input border p-2 rounded w-full" formControlName="type" placeholder="e.g. Oil change" />
+          @if (type.invalid && (type.dirty || type.touched)) {
+            @if (type.hasError('required')) {
+              <div class="text-red-600 text-sm mt-1">
+                Type is required.
+              </div>
+            }
+          }
         </div>
         <div>
           <label class="block text-sm font-medium mb-1">Date</label>
           <input type="date" class="form-input border p-2 rounded w-full" formControlName="date" />
+          @if (date.invalid && (date.dirty || date.touched)) {
+            @if (date.hasError('required')) {
+              <div class="text-red-600 text-sm mt-1">
+                Date is required.
+              </div>
+            }
+            @if (date.hasError('dateInFuture')) {
+              <div class="text-red-600 text-sm mt-1">
+                Date cannot be in the future.
+              </div>
+            }
+          }
         </div>
         <div>
           <label class="block text-sm font-medium mb-1">Cost (€)</label>
           <input type="number" class="form-input border p-2 rounded w-full" formControlName="cost" placeholder="100" />
+          @if (cost.invalid && (cost.dirty || cost.touched)) {
+            @if (cost.hasError('required')) {
+              <div class="text-red-600 text-sm mt-1">
+                Cost is required.
+              </div>
+            }
+            @if (cost.hasError('min')) {
+              <div class="text-red-600 text-sm mt-1">
+                Cost must be at least 0.
+              </div>
+            }
+          }
         </div>
         <div>
           <label class="block text-sm font-medium mb-1">Vehicle</label>
@@ -67,11 +95,20 @@
               {{ v.registrationNumber }}
             </option>
           </select>
+          @if (vehicleId.invalid && (vehicleId.dirty || vehicleId.touched)) {
+            @if (vehicleId.hasError('required')) {
+              <div class="text-red-600 text-sm mt-1">
+                Vehicle is required.
+              </div>
+            }
+          }
         </div>
       </div>
       <div class="mt-4 flex justify-end">
         <button type="submit"
                 [disabled]="maintenanceForm.invalid"
+                [class.opacity-50]="maintenanceForm.invalid"
+                [class.cursor-not-allowed]="maintenanceForm.invalid"
                 class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded">
           Add
         </button>

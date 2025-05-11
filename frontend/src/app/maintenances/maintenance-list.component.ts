@@ -4,15 +4,15 @@ import {Maintenance} from '../core/models/maintenance.model';
 import {DatePipe, NgForOf, NgIf} from '@angular/common';
 import {FaIconComponent} from '@fortawesome/angular-fontawesome';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
-import {faPen, faTrash} from '@fortawesome/free-solid-svg-icons';
+import {faTrash} from '@fortawesome/free-solid-svg-icons';
 import {ToastrService} from 'ngx-toastr';
 import {Vehicle} from '../core/models/vehicle.model';
 import {VehicleService} from '../core/services/vehicle.service';
+import {dateNotInFutureValidator} from '../core/validators/date-not-in-future.validator';
 
 @Component({
   selector: 'app-maintenance-list',
   imports: [
-    DatePipe,
     FaIconComponent,
     FormsModule,
     NgForOf,
@@ -46,10 +46,11 @@ export class MaintenanceListComponent implements OnInit{
   initForm(): void {
     this.maintenanceForm = this.fb.group({
       type: ['', Validators.required],
-      date: ['', Validators.required],
+      date: ['', [Validators.required, dateNotInFutureValidator()]],
       cost: ['', [Validators.required, Validators.min(0)]],
       vehicleId: [null, Validators.required],
     });
+    this.maintenanceForm.markAllAsTouched();
   }
 
   onSubmit(): void {
@@ -87,17 +88,19 @@ export class MaintenanceListComponent implements OnInit{
     });
   }
 
-  editMaintenance(maintenance: Maintenance): void {
-
-  }
-
   deleteMaintenance(id: number): void {
-    this.service.delete(id).subscribe({
-      next: () => {
-        this.fetchMaintenances();
-        this.toastr.success('Maintenance deleted successfully');
-      }
-    });
+    if (confirm('Are you sure you want to delete this maintenance?')) {
+      this.service.delete(id).subscribe({
+        next: () => {
+          this.fetchMaintenances();
+          this.toastr.success('Maintenance deleted successfully');
+        },
+        error: (error) => {
+          console.error('Error deleting maintenance', error);
+          this.toastr.error('Failed to delete maintenance');
+        }
+      });
+    }
   }
 
   openModal(): void {
@@ -108,6 +111,21 @@ export class MaintenanceListComponent implements OnInit{
     this.isModalOpen = false;
   }
 
-  protected readonly faPen = faPen;
   protected readonly faTrash = faTrash;
+
+  get type() {
+    return this.maintenanceForm.get('type')!;
+  }
+
+  get date() {
+    return this.maintenanceForm.get('date')!;
+  }
+
+  get cost() {
+    return this.maintenanceForm.get('cost')!;
+  }
+
+  get vehicleId() {
+    return this.maintenanceForm.get('vehicleId')!;
+  }
 }

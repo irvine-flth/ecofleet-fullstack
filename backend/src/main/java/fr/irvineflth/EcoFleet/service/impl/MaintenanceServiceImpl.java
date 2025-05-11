@@ -44,8 +44,14 @@ public class MaintenanceServiceImpl implements MaintenanceService {
         Maintenance maintenance = this.mapper.toEntity(dto, vehicle);
         maintenance.setVehicle(vehicle);
 
-        maintenance = this.maintenanceRepository.save(maintenance);
-        return this.mapper.toDto(maintenance);
+        Maintenance saved = this.maintenanceRepository.save(maintenance);
+
+        if (vehicle.getLastMaintenanceDate() == null || dto.getDate().isAfter(vehicle.getLastMaintenanceDate())) {
+            vehicle.setLastMaintenanceDate(dto.getDate());
+            this.vehicleRepository.save(vehicle);
+        }
+
+        return this.mapper.toDto(saved);
     }
 
     @Override
