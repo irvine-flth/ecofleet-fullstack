@@ -14,8 +14,10 @@ public interface MaintenanceMapper {
     @Mapping(source = "vehicle.id", target = "vehicleId")
     MaintenanceDto toDto(Maintenance maintenance);
 
-    @Mapping(target = "vehicle", ignore = true)
-    Maintenance toEntity(MaintenanceDto maintenanceDto, @Context Vehicle vehicle);
+    @Mapping(source = "maintenanceDto.id", target = "id")
+    @Mapping(source = "maintenanceDto.type", target = "type")
+    @Mapping(target = "vehicle", expression = "java(vehicle)")
+    Maintenance toEntity(MaintenanceDto maintenanceDto, Vehicle vehicle);
 
-    MaintenanceMapper INSTANCE = Mappers.getMapper(MaintenanceMapper.class);
+    MaintenanceMapper INSTANCE = Mappers.getMapper(MaintenanceMapper.class); // For unit tests
 }

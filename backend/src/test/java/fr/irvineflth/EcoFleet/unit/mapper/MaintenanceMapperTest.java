@@ -44,7 +44,6 @@ public class MaintenanceMapperTest {
                 .build();
 
         Maintenance entity = mapper.toEntity(dto, vehicle);
-        entity.setVehicle(vehicle);
 
         assertThat(entity.getType()).isEqualTo("Pneus");
         assertThat(entity.getCost()).isEqualTo(250);

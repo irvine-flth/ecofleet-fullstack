@@ -13,5 +13,5 @@ public interface VehicleMapper {
     Vehicle toEntity(VehicleDto dto);
     List<VehicleDto> toDtoList(List<Vehicle> entities);
 
-    VehicleMapper INSTANCE = Mappers.getMapper(VehicleMapper.class);
+    VehicleMapper INSTANCE = Mappers.getMapper(VehicleMapper.class); // For unit tests
 }

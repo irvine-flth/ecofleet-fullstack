@@ -42,7 +42,6 @@ public class MaintenanceServiceImpl implements MaintenanceService {
                 .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found with id: " + dto.getVehicleId()));
 
         Maintenance maintenance = this.mapper.toEntity(dto, vehicle);
-        maintenance.setVehicle(vehicle);
 
         Maintenance saved = this.maintenanceRepository.save(maintenance);
 
