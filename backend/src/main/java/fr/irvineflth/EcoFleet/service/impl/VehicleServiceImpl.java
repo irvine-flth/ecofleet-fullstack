@@ -2,6 +2,7 @@ package fr.irvineflth.EcoFleet.service.impl;
 
 import fr.irvineflth.EcoFleet.domain.entity.Vehicle;
 import fr.irvineflth.EcoFleet.dto.VehicleDto;
+import fr.irvineflth.EcoFleet.exception.RegistrationAlreadyExistsException;
 import fr.irvineflth.EcoFleet.exception.ResourceNotFoundException;
 import fr.irvineflth.EcoFleet.mapper.VehicleMapper;
 import fr.irvineflth.EcoFleet.repository.VehicleRepository;
@@ -36,7 +37,7 @@ public class VehicleServiceImpl implements VehicleService {
     @Override
     public VehicleDto create(VehicleDto vehicleDto) {
         if (this.repository.existsByRegistrationNumber(vehicleDto.getRegistrationNumber())) {
-            throw new RuntimeException("Registration number already exists");
+            throw new RegistrationAlreadyExistsException("Registration number already exists");
         }
         Vehicle vehicle = this.mapper.toEntity(vehicleDto);
         return this.mapper.toDto(this.repository.save(vehicle));
@@ -45,7 +46,12 @@ public class VehicleServiceImpl implements VehicleService {
     @Override
     public VehicleDto update(long id, VehicleDto vehicleDto) {
         Vehicle existing = this.repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Vehicle not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found with id: " + id));
+
+        if (this.repository.existsByRegistrationNumber(vehicleDto.getRegistrationNumber())) {
+            throw new RegistrationAlreadyExistsException("Registration number already exists");
+        }
+
         Vehicle updated = this.mapper.toEntity(vehicleDto);
         updated.setId(existing.getId());
         return this.mapper.toDto(this.repository.save(updated));
